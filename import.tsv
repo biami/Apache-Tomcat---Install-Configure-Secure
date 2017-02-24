@@ -1,0 +1,29 @@
+Stage	Generic Task Description	Technical Task Description	Script			
+0	Apache Tomcat - Install Configure Secure	[replace]	do_nothing			
+1			run_command	runcommand=apt-get update		
+2			run_command	runcommand=apt-get install |||java_version|||-headless		
+3			run_command	runcommand=groupadd |||tomcat_group|||		
+4			run_command	runcommand=useradd -s /bin/false -g |||tomcat_group||| -d |||tomcat_dir||| |||tomcat_user|||		
+5			download_file	uri=http://apache.mirrors.ionfish.org/tomcat/tomcat-|||tomcat_v|||/v|||tomcat_version|||/bin/apache-tomcat-|||tomcat_version|||.tar.gz	filename=apache-tomcat-|||tomcat_version|||.tar.gz	destinationdir=|||dir|||temp/
+6			run_command	runcommand=tar -xzvf |||dir|||temp/apache-tomcat-|||tomcat_version|||.tar.gz -C |||dir|||temp		
+7			run_command	runcommand=mv |||dir|||temp/apache-tomcat-|||tomcat_version||| |||tomcat_dir|||		
+8			run_command	runcommand=chgrp -R |||tomcat_group||| |||tomcat_dir|||		
+9			run_command	runcommand=chown -R |||tomcat_user||| |||tomcat_dir|||		
+10			run_command	runcommand=chmod -R 755 |||tomcat_dir|||		
+11			download_file	uri=http://www.biami.io/files/it-infra/free/tomcat-install-configure-secure-tomcat-service-|||tomcat_v|||	filename=|||tomcat_service|||.service	destinationdir=/etc/systemd/system/
+12			run_command	runcommand=sed -i 's/8080/|||tomcat_port|||/g' |||tomcat_dir|||/conf/server.xml		
+13			run_command	runcommand=sed -i 's,/opt/tomcat,|||tomcat_dir|||,g' /etc/systemd/system/tomcat.service		
+14			run_command	runcommand=sed -i 's,java-8-openjdk,|||java_version|||,g' /etc/systemd/system/tomcat.service		
+15			run_command	runcommand=systemctl daemon-reload		
+16			run_command	runcommand=systemctl start |||tomcat_service|||		
+17		start tomcat at boot	run_command	runcommand=systemctl enable |||tomcat_service|||		
+						
+						
+p	java_version	openjdk-8-jdk				
+p	tomcat_user	tomcat				
+p	tomcat_group	tomcat				
+p	tomcat_dir	/opt/tomcat				
+p	tomcat_version	8.5.11				
+p	tomcat_v	8				
+p	tomcat_service	tomcat				
+p	tomcat_port	8080				
